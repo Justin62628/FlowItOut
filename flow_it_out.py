@@ -14,6 +14,7 @@ from skvideo.io.ffmpeg import FFmpegReader, FFmpegWriter
 sys.path.append('Flow')
 sys.path.append('Flow/RAFT')
 sys.path.append('Flow/RAFT/core')
+sys.path.append('Flow/gmflow')
 # For the sake of importing RAFT
 
 global_args_parser = argparse.ArgumentParser(prog="#### FlowItOut by Jeanna ####",
@@ -23,14 +24,15 @@ global_basic_parser.add_argument('-i', '--input', dest='input', type=str, requir
                                  help="Path of input video")
 global_basic_parser.add_argument('-s', '--resize', dest='resize', type=str, default="480x270",
                                  help="Resized Resolution for flow, leave '0' for no-resize")
+global_basic_parser.add_argument('--model', default="models/raft.pth", help="restore checkpoint")
 
 flow_selection_parser = global_basic_parser.add_mutually_exclusive_group()
 flow_selection_parser.add_argument('--raft', action='store_true')
-flow_selection_parser.add_argument('--others', action='store_false')  # TODO implement other flow algorithms
+flow_selection_parser.add_argument('--gmflow', action='store_true')
+flow_selection_parser.add_argument('--others', action='store_false')
 
 global_raft_parser = global_args_parser.add_argument_group(title="RAFT Settings",
                                                            description="Set the following parameters for RAFT")
-global_raft_parser.add_argument('--model', default="models/raft.pth", help="restore checkpoint")
 global_raft_parser.add_argument('--small', action='store_true', help='use small model')
 global_raft_parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
 global_raft_parser.add_argument('--alternate_corr', action='store_true',
@@ -46,10 +48,10 @@ if __name__ == '__main__':
 
         inference = RaftInference(global_args)
     else:
-        # Default: RAFT
-        from FlowInference.inference import RaftInference
+        # GMFlow
+        from FlowInference.inference import GmfInference
 
-        inference = RaftInference(global_args)
+        inference = GmfInference(global_args)
     RGB_TYPE.change_8bit(True)
     project_dir = "Projects"
     os.makedirs(project_dir, exist_ok=True)
@@ -82,7 +84,7 @@ if __name__ == '__main__':
     # NOTE THAT FFmpeg should be within System Environments(PATH), or the follow call would fail
     reader = FFmpegReader(global_args.input, inputdict=reader_input_dict, outputdict=reader_output_dict,
                           outputfps=video_info.fps, inputfps=video_info.fps, verbosity=0)
-    writer = FFmpegWriter(global_args.input + ".output.mp4", inputdict=writer_input_dict, outputdict=writer_output_dict,
+    writer = FFmpegWriter(Tools.get_filename(global_args.input) + ".output.mp4", inputdict=writer_input_dict, outputdict=writer_output_dict,
                           verbosity=0)
     reader_gen = reader.nextFrame()
 

@@ -29,12 +29,15 @@ For RAFT, download `raft.pkl` at [Google Drive](https://drive.google.com/drive/f
 mkdir test
 python flow_it_out.py -i test/test.mp4
 ```
+Typical Commands to use GMF:
+```bash
+python ./flow_it_out.py -i test/test.mp4 -s 960x540 --gmflow --model models/flownet.pkl
+```
 4.1 Please DO Remember to read notes by ```python flow_it_out.py --help```
 ```
-usage: #### FlowItOut by Jeanna #### [-h] -i INPUT [-s RESIZE]
-                                     [--raft | --others] [--model MODEL]
-                                     [--small] [--mixed_precision]
-                                     [--alternate_corr]
+usage: #### FlowItOut by Jeanna #### [-h] -i INPUT [-s RESIZE] [--model MODEL]
+                                     [--raft | --gmflow | --others] [--small] 
+                                     [--mixed_precision] [--alternate_corr]   
 
 To generate flow by different trending algorithms
 
@@ -46,13 +49,14 @@ Basic Settings:
                         Path of input video
   -s RESIZE, --resize RESIZE
                         Resized Resolution for flow, leave '0' for no-resize
+  --model MODEL         restore checkpoint
   --raft
+  --gmflow
   --others
 
 RAFT Settings:
   Set the following parameters for RAFT
 
-  --model MODEL         restore checkpoint
   --small               use small model
   --mixed_precision     use mixed precision
   --alternate_corr      use efficent correlation implementation, if
